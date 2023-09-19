@@ -37,6 +37,13 @@ docker exec -it fastapi_container /bin/bash
 
 ## ライブサーバーの実行（以下のコマンドはコンテナ内のシェルで実行する）
 
+Uvicorn（アプリケーションを実行するためのサーバー）を起動する
+
 ```sh
 uvicorn main:app --host 0.0.0.0 --port 8000 --reload
 ```
+
+- `main:app`: エントリポイントを指定する main.py の中の app インスタンスを使用すると言う意味
+- `--host 0.0.0.0`: FastAPI アプリケーションをすべてのネットワークインターフェースにバインドする
+- `--port 8000`: 監視するポート番号を指定する
+- `--reload`: ファイルに変更があると自動で再起動する
