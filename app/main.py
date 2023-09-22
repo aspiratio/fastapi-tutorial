@@ -87,3 +87,9 @@ async def get_answer_path(boolean: bool):
     # True, 1, on, yes は true として扱われる
     # False, 0, off, no は false として扱われる
     return {"boolean": boolean}
+
+
+# 複数のパラメータ
+@app.get("/users/{user_id}/items/{item_id}")
+async def get_user_item(item_id: int, user_id: str):  # 引数は順不同
+    return {"user_id": user_id, "item_id": item_id}
