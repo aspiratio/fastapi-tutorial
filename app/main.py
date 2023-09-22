@@ -1,5 +1,6 @@
 from fastapi import FastAPI
 from enum import Enum
+from typing import Optional, Union
 
 
 class ModelName(str, Enum):
@@ -45,3 +46,19 @@ async def get_model(model_name: ModelName):
 @app.get("/files/{file_path:path}")
 async def read_file(file_path: str):
     return {"file_path": file_path}
+
+
+# クエリパラメータ
+@app.get("/countries/")  # パスパラメータを設定しなければクエリパラメータとみなされる
+async def get_countries(
+    country_name: str = "America", city_name: str = "NewYork"
+):  # デフォルトの値を設定可能
+    return {"country_name": country_name, "city_name": city_name}
+
+
+# パスパラメータ＋クエリパラメータ
+@app.get("/countries/{country_name}")
+async def get_countries(
+    country_name: str = "America", city_name: str = "NewYork"
+):  # パスパラメータに指定したやつ以外をクエリパラメータとして自動で識別してくれる
+    return {"country_name": country_name, "city_name": city_name}
