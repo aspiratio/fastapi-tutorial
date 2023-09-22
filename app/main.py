@@ -62,3 +62,20 @@ async def get_countries(
     country_name: str = "America", city_name: str = "NewYork"
 ):  # パスパラメータに指定したやつ以外をクエリパラメータとして自動で識別してくれる
     return {"country_name": country_name, "city_name": city_name}
+
+
+# オプショナルパラメータ
+@app.get("/items/")
+async def get_countries(
+    q: Optional[str] = "test",  # Optionalを使うと str | None つまり任意のパラメータになる
+):
+    return {"q": q}
+
+
+# 複数の型指定
+@app.get("/items/{item_id}")
+async def get_countries(
+    item_id: Union[int, float],  # 複数の型指定ができる
+    q: Union[str, None] = "test",  # Optional[str] と同じ使い方ができる
+):
+    return {"item_id": item_id, "q": q}
