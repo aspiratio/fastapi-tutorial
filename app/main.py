@@ -79,3 +79,11 @@ async def get_item(
     q: Union[str, None] = "test",  # Optional[str] と同じ使い方ができる
 ):
     return {"item_id": item_id, "q": q}
+
+
+# bool型の使用
+@app.get("/answer/{boolean}")
+async def get_answer_path(boolean: bool):
+    # True, 1, on, yes は true として扱われる
+    # False, 0, off, no は false として扱われる
+    return {"boolean": boolean}
