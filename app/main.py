@@ -52,7 +52,7 @@ async def read_file(file_path: str):
 @app.get("/countries/")  # パスパラメータを設定しなければクエリパラメータとみなされる
 async def get_countries(
     country_name: str = "America", city_name: str = "NewYork"
-):  # デフォルトの値を設定可能
+):  # デフォルトの値を設定可能（任意のパラメータにできる）
     return {"country_name": country_name, "city_name": city_name}
 
 
@@ -67,7 +67,7 @@ async def get_countries(
 # オプショナルパラメータ
 @app.get("/items/")
 async def get_items(
-    q: Optional[str] = "test",  # Optionalを使うと str | None つまり任意のパラメータになる
+    q: Optional[str] = None,  # Optionalを使うと str | None つまりデフォルト値をNoneにできる
 ):
     return {"q": q}
 
@@ -76,7 +76,7 @@ async def get_items(
 @app.get("/items/{item_id}")
 async def get_item(
     item_id: Union[int, float],  # 複数の型指定ができる
-    q: Union[str, None] = "test",  # Optional[str] と同じ使い方ができる
+    q: Union[str, None] = None,  # Optional[str] と同じ使い方ができる
 ):
     return {"item_id": item_id, "q": q}
 
