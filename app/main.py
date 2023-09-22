@@ -66,7 +66,7 @@ async def get_countries(
 
 # オプショナルパラメータ
 @app.get("/items/")
-async def get_countries(
+async def get_items(
     q: Optional[str] = "test",  # Optionalを使うと str | None つまり任意のパラメータになる
 ):
     return {"q": q}
@@ -74,7 +74,7 @@ async def get_countries(
 
 # 複数の型指定
 @app.get("/items/{item_id}")
-async def get_countries(
+async def get_item(
     item_id: Union[int, float],  # 複数の型指定ができる
     q: Union[str, None] = "test",  # Optional[str] と同じ使い方ができる
 ):
