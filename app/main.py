@@ -1,6 +1,7 @@
 from fastapi import FastAPI
 from enum import Enum
 from typing import Optional, Union
+from pydantic import BaseModel
 
 
 class ModelName(str, Enum):
@@ -93,3 +94,16 @@ async def get_answer_path(boolean: bool):
 @app.get("/users/{user_id}/items/{item_id}")
 async def get_user_item(item_id: int, user_id: str):  # 引数は順不同
     return {"user_id": user_id, "item_id": item_id}
+
+
+# データモデルの作成
+class Item(BaseModel):
+    name: str
+    description: Union[str, None] = None  # デフォルト値を持たせると任意の属性になる
+    price: float
+    tax: Union[float, None] = None
+
+
+@app.post("/items/")
+async def create_item(item: Item):
+    return item
