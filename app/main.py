@@ -13,7 +13,7 @@ class ModelName(str, Enum):
 app = FastAPI()  # FastAPIのインスタンス化
 
 
-# 基本
+# 基本（GET）
 @app.get("/")  # インスタンス化したappにHTTPメソッド（オペレーションと呼ぶ）のGETで"/"のURLにアクセスがあったら下の関数を実行するという意味
 async def root():
     return {"message": "Hello World"}
@@ -104,8 +104,9 @@ class Item(BaseModel):
     tax: Union[float, None] = None
 
 
+# POST
 @app.post("/items/")
-async def create_item(item: Item):
+async def add_price_with_tax(item: Item):
     # BaseModel.property で各要素にアクセスできる
     if item.tax:
         price_with_tax = item.price * item.tax
@@ -115,3 +116,20 @@ async def create_item(item: Item):
     item_dict = item.dict()
     item_dict.update({"price_with_tax": price_with_tax})
     return item_dict
+
+
+# ボディとパスパラメータを併用
+@app.post("/items/{item_id}")
+async def create_item(item_id: int, item: Item):  # パスパラメータ以外は自動でリクエストボディから受け取る
+    return {"item_id": item_id, **item.dict()}
+
+
+# ボディとパスパラメータとクエリパラメータを併用
+@app.post("/items/v2/{item_id}")
+async def create_item_v2(
+    item_id: int, item: Item, q: Union[str, None] = None
+):  # データ型が単数型なら、Bodyではなくクエリパラメータとして認識する
+    result = {"item_id": item_id, **item.dict()}
+    if q:
+        result.update({"q": q})
+    return result
