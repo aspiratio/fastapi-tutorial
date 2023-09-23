@@ -106,4 +106,12 @@ class Item(BaseModel):
 
 @app.post("/items/")
 async def create_item(item: Item):
-    return item
+    # BaseModel.property で各要素にアクセスできる
+    if item.tax:
+        price_with_tax = item.price * item.tax
+    else:
+        item.description = "消費税なし"
+        price_with_tax = item.price
+    item_dict = item.dict()
+    item_dict.update({"price_with_tax": price_with_tax})
+    return item_dict
