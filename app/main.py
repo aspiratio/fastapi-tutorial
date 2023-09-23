@@ -1,4 +1,4 @@
-from fastapi import FastAPI
+from fastapi import FastAPI, Query
 from enum import Enum
 from typing import Optional, Union
 from pydantic import BaseModel
@@ -94,6 +94,19 @@ async def get_answer_path(boolean: bool):
 @app.get("/users/{user_id}/items/{item_id}")
 async def get_user_item(item_id: int, user_id: str):  # 引数は順不同
     return {"user_id": user_id, "item_id": item_id}
+
+
+# クエリパラメータにバリデーションを設定
+@app.get("/products/")
+async def read_products(
+    q: Union[str, None] = Query(
+        default=None, min_length=3, max_length=50, pattern="^fixedquery$"
+    )
+):  # ここではデフォルト値の設定と文字数の制限を行なっている
+    results = {"products": [{"product_id_": "Foo"}, {"product_id": "Bar"}]}
+    if q:
+        results.update({"q": q})
+    return results
 
 
 # データモデルの作成
