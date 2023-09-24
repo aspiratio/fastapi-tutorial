@@ -1,6 +1,6 @@
 from fastapi import FastAPI, Query
 from enum import Enum
-from typing import Optional, Union
+from typing import Optional, Union, List
 from pydantic import BaseModel
 
 
@@ -103,16 +103,25 @@ async def read_products(
         default=None, min_length=3, max_length=50, pattern="^fixedquery$"
     )
 ):  # ここではデフォルト値の設定と文字数の制限を行なっている
-    results = {"products": [{"product_id_": "Foo"}, {"product_id": "Bar"}]}
+    results = {"products": [{"product_id": "Foo"}, {"product_id": "Bar"}]}
     if q:
         results.update({"q": q})
     return results
 
 
+# 同じクエリパラメータで複数の値を受け取る ex: http://localhost:8000/items/?q=foo&q=bar
+@app.get("/contents/")
+async def read_contents(
+    q: List[str] = Query(default=["foo", "bar"], min_length=3, max_length=50)
+):  # 文字数制限は各値（fooやbar）に適応される
+    query_items = {"q": q}
+    return query_items
+
+
 # データモデルの作成
 class Item(BaseModel):
     name: str
-    description: Union[str, None] = None  # デフォルト値を持たせると任意の属性になる
+    description: Union[str, None] = None  # Noneに限らず、何かしらのデフォルト値を持たせると任意の属性になる
     price: float
     tax: Union[float, None] = None
 
