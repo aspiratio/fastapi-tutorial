@@ -126,7 +126,7 @@ async def get_items_v2(
         title="Query string",
         description="Query string for the items to search in the database that have a good match",
     )
-):  # 文字数制限は各値（fooやbar）に適応される
+):
     results = {"items": [{"item_id": "Foo"}, {"item_id": "Bar"}]}
     if q:
         results.update({"q": q})
