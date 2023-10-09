@@ -1,6 +1,6 @@
-from fastapi import FastAPI, Query
+from fastapi import FastAPI, Query, Path
 from enum import Enum
-from typing import Optional, Union, List
+from typing import Optional, Union, List, Annotated
 from pydantic import BaseModel
 
 
@@ -133,12 +133,51 @@ async def get_items_v2(
     return results
 
 
+# エイリアスパラメータ（クエリパラメータが命名規則にそぐわない場合などに使う）
+@app.get("/items/v3/")
+async def get_items_v3(q: Union[str, None] = Query(default=None, alias="item-query")):
+    results = {"items": [{"item_id": "Foo"}, {"item_id": "Bar"}]}
+    if q:
+        results.update({"q": q})
+    return results
+
+
+# 非推奨パラメータであることを明記（ドキュメントに反映される）
+@app.get("/items/v4/")
+async def get_items_v4(
+    q: Union[str, None] = Query(default=None, alias="item-query", deprecated=True)
+):
+    results = {"items": [{"item_id": "Foo"}, {"item_id": "Bar"}]}
+    if q:
+        results.update({"q": q})
+    return results
+
+
+# Annotated でメタデータやバリデーションの追加 pythonやFastAPIのバージョンに注意
+@app.get("/items/v5/{item_id}")
+async def get_items_v5(
+    item_id: Annotated[
+        int, Path(title="The ID of the item to get", ge=1)
+    ],  # ge1は1以上の意味
+    q: Annotated[Union[str, None], Query(alias="item-query")] = None,
+):
+    results = {"items": item_id}
+    if q:
+        results.update({"q": q})
+    return results
+
+
 # データモデルの作成
 class Item(BaseModel):
     name: str
     description: Union[str, None] = None  # Noneに限らず、何かしらのデフォルト値を持たせると任意の属性になる
     price: float
     tax: Union[float, None] = None
+
+
+class User(BaseModel):
+    nickname: str
+    full_name: Union[str, None] = None
 
 
 # POST
@@ -164,9 +203,42 @@ async def create_item(item_id: int, item: Item):  # パスパラメータ以外�
 # ボディとパスパラメータとクエリパラメータを併用
 @app.post("/items/v2/{item_id}")
 async def create_item_v2(
-    item_id: int, item: Item, q: Union[str, None] = None
+    item_id: int,
+    item: Item,
+    q: Union[str, None] = None,
 ):  # データ型が単数型なら、Bodyではなくクエリパラメータとして認識する
+    """
+    リクエストボディの例
+    {
+      "name": "string",
+      "description": "string",
+      "price": 0,
+      "tax": 0
+    }
+    """
     result = {"item_id": item_id, **item.dict()}
     if q:
         result.update({"q": q})
     return result
+
+
+# 複数のボディパラメータを使用
+@app.post("/items/v3/{item_id}")
+async def update_item(item_id: int, item: Item, user: User):
+    """
+    リクエストボディの例
+    {
+      "item": {
+        "name": "pen",
+        "description": "for writing",
+        "price": 100,
+        "tax": 10
+      },
+      "user": {
+        "nickname": "Taro",
+        "full_name": "Taro Aso"
+      }
+    }
+    """
+    results = {"item_id": item_id, "item": item, "user": user}
+    return results
