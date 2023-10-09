@@ -244,10 +244,27 @@ async def update_item_v3(item_id: int, item: Item, user: User):
     return results
 
 
+# 単一のボディパラメータでも名前をつけさせる
+@app.post("/items/v4/{item_id}")
+async def update_item_v4(item_id: int, item: Annotated[Item, Body(embed=True)]):
+    """
+    {
+      "item": {
+        "name": "string",
+        "description": "string",
+        "price": 0,
+        "tax": 0
+      }
+    }
+    """
+    results = {"item_id": item_id, "item": item}
+    return results
+
+
 # PUT
 # データモデルを使わずにボディパラメータを宣言する
-@app.put("/items/v4/{item_id}")
-async def update_item_v4(
+@app.put("/items/v5/{item_id}")
+async def update_item_v5(
     item_id: int,
     item: Item,
     user: User,
