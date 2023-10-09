@@ -1,4 +1,4 @@
-from fastapi import FastAPI, Query, Path
+from fastapi import FastAPI, Query, Path, Body
 from enum import Enum
 from typing import Optional, Union, List, Annotated
 from pydantic import BaseModel
@@ -224,7 +224,7 @@ async def create_item_v2(
 
 # 複数のボディパラメータを使用
 @app.post("/items/v3/{item_id}")
-async def update_item(item_id: int, item: Item, user: User):
+async def update_item_v3(item_id: int, item: Item, user: User):
     """
     リクエストボディの例
     {
@@ -241,4 +241,34 @@ async def update_item(item_id: int, item: Item, user: User):
     }
     """
     results = {"item_id": item_id, "item": item, "user": user}
+    return results
+
+
+# PUT
+# データモデルを使わずにボディパラメータを宣言する
+@app.put("/items/v4/{item_id}")
+async def update_item_v4(
+    item_id: int,
+    item: Item,
+    user: User,
+    importance: Annotated[
+        Union[int, None], Body(gt=0)
+    ] = 0,  # ボディに任意のパラメータ（0以上の数値）があるという意味になる
+):
+    """
+    {
+      "item": {
+        "name": "string",
+        "description": "string",
+        "price": 0,
+        "tax": 0
+      },
+      "user": {
+        "nickname": "string",
+        "full_name": "string"
+      },
+      "importance": 10
+    }
+    """
+    results = {"item_id": item_id, "item": item, "user": user, "importance": importance}
     return results
